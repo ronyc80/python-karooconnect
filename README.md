@@ -56,6 +56,40 @@ save_tokens(
 api = Karoo(tokenstore="~/.karooconnect/tokens.json")
 ```
 
+## First live smoke test
+
+Create `~/.karooconnect/tokens.json`:
+
+```json
+{
+  "access_token": "paste-bearer-token-here",
+  "user_id": "paste-user-id-here"
+}
+```
+
+Do not commit this file and do not paste the token into issues, logs, or chat.
+
+To get the current token and user id from your own browser session:
+
+1. Open `https://dashboard.hammerhead.io/` and sign in with your SRAM account.
+2. Open browser developer tools and go to the Network tab.
+3. Reload the dashboard or open the activities page.
+4. Filter requests for `nexus.quarqnet.com` or `activities`.
+5. Select a request shaped like `/v1/users/{user_id}/activities`.
+6. Copy `{user_id}` from the request URL.
+7. Copy the request header `Authorization: Bearer ...` and save only the token
+   part after `Bearer ` as `access_token`.
+
+Then run:
+
+```bash
+uv --cache-dir .uv-cache run --extra testing python scripts/smoke_activities.py
+```
+
+The script calls `get_activities()`, `get_activity_details(first_id)`, and
+`download_activity_fit(first_id)`. It prints only counts, IDs, payload type, and
+FIT byte size.
+
 ## Current auth scope
 
 Browser Authorization Code + PKCE and refresh-token exchange are intentionally
