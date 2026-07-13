@@ -1,0 +1,153 @@
+[project]
+name = "karooconnect"
+version = "0.1.0"
+description = "Unofficial Python client for Karoo / SRAM activity APIs"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+dependencies = [
+    "requests>=2.28",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+keywords = ["karoo", "hammerhead", "sram", "cycling", "api"]
+
+[project.urls]
+"Homepage" = "https://github.com/ronychudnovsky/python-karooconnect"
+"Issues" = "https://github.com/ronychudnovsky/python-karooconnect/issues"
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[project.optional-dependencies]
+linting = [
+    "black",
+    "isort",
+    "mypy",
+    "ruff",
+    "types-requests",
+]
+testing = [
+    "coverage",
+    "pytest",
+]
+dev = [
+    "ipython",
+]
+
+[tool.pytest.ini_options]
+addopts = "--ignore=__pypackages__"
+
+[tool.mypy]
+python_version = "3.10"
+disallow_untyped_defs = true
+ignore_missing_imports = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = [
+    "conftest",
+    "test_auth_unit",
+    "test_client_unit",
+    "test_activities_unit",
+]
+disallow_untyped_defs = false
+warn_unused_ignores = false
+
+[tool.isort]
+profile = "black"
+line_length = 88
+known_first_party = "karoo"
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+exclude = [
+    ".git",
+    ".venv",
+    "__pycache__",
+    ".pytest_cache",
+    "build",
+    "dist",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "W",
+    "F",
+    "I",
+    "B",
+    "C4",
+    "UP",
+    "ARG",
+    "SIM",
+    "S",
+    "D",
+    "PTH",
+    "PL",
+    "RUF",
+    "TRY",
+    "PERF",
+    "LOG",
+    "G",
+    "T20",
+    "PIE",
+    "RET",
+    "TCH",
+    "ERA",
+]
+ignore = [
+    "D100",
+    "D104",
+    "D105",
+    "D107",
+    "D203",
+    "D213",
+    "PLR0913",
+    "PLR2004",
+    "S311",
+    "TRY003",
+    "TRY004",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["ARG", "D102", "D103", "S101", "S105", "S106", "PLR0913", "PLR2004"]
+
+[tool.coverage.run]
+source = ["karoo"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "if __name__ == \"__main__\":",
+]
+
+[tool.pdm]
+distribution = true
+
+[tool.pdm.build]
+excludes = [
+    "tests/**",
+    ".github/**",
+]
+
+[tool.pdm.scripts]
+format = {composite = ["ruff check . --fix --unsafe-fixes", "isort . --skip-gitignore", "black -l 88 ."]}
+lint = {composite = ["isort --check-only . --skip-gitignore", "ruff check .", "black -l 88 . --check --diff", "mypy karoo tests"]}
+test = {cmd = "coverage run -m pytest -v --durations=10"}
+testcov = {composite = ["test", "coverage html", "coverage xml -o coverage/coverage.xml"]}
+all = {composite = ["lint", "test"]}
