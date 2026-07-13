@@ -122,6 +122,17 @@ The script calls `get_activities()`, `get_activity_details(first_id)`, and
 `download_activity_fit(first_id)`. It prints only counts, IDs, payload type, and
 FIT byte size.
 
+## Live tests
+
+Live tests are skipped by default. With `.env` populated, run:
+
+```bash
+KAROO_LIVE=1 uv --cache-dir .uv-cache run --extra testing pytest tests/test_live_activities.py -q
+```
+
+These tests call the live dashboard API and validate activity listing, activity
+details, and FIT download. They do not print or persist your token.
+
 ## Current auth scope
 
 Browser Authorization Code + PKCE and refresh-token exchange are intentionally

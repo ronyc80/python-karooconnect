@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import pytest
 import requests
-from conftest import DummyResponse, RecordingSession
 
 from karoo import (
     KarooAuthenticationError,
@@ -13,6 +12,7 @@ from karoo import (
     KarooRequestError,
     KarooTooManyRequestsError,
 )
+from tests.conftest import DummyResponse, RecordingSession
 
 
 def test_request_builds_prefixed_url_and_bearer_header():

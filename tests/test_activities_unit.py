@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import pytest
-from conftest import DummyResponse, RecordingSession
 
 from karoo import Karoo, KarooClient, KarooConfigurationError
+from tests.conftest import DummyResponse, RecordingSession
 
 
 def test_get_activities_builds_expected_query_params():

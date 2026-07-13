@@ -54,11 +54,13 @@ warn_unused_ignores = true
 
 [[tool.mypy.overrides]]
 module = [
-    "conftest",
-    "test_auth_unit",
-    "test_client_unit",
-    "test_activities_unit",
-    "test_smoke_unit",
+    "tests.conftest",
+    "tests.test_auth_unit",
+    "tests.test_client_unit",
+    "tests.test_activities_unit",
+    "tests.test_smoke_unit",
+    "tests.test_live_activities",
+    "tests.live_helpers",
 ]
 disallow_untyped_defs = false
 warn_unused_ignores = false
@@ -122,7 +124,7 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "scripts/*" = ["S105", "T20"]
-"tests/*" = ["ARG", "D102", "D103", "S101", "S105", "S106", "PLR0913", "PLR2004"]
+"tests/*" = ["ARG", "D102", "D103", "S101", "S105", "S106", "PLR0913", "PLR2004", "PT015"]
 
 [tool.coverage.run]
 source = ["karoo"]
