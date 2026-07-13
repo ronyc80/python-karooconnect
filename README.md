@@ -58,7 +58,25 @@ api = Karoo(tokenstore="~/.karooconnect/tokens.json")
 
 ## First live smoke test
 
-Create `~/.karooconnect/tokens.json`:
+Use either a repo-local `.env` file or `~/.karooconnect/tokens.json`.
+
+For local repo testing, copy the example file:
+
+```bash
+cp .env.example .env
+```
+
+Then fill `.env`:
+
+```bash
+KAROO_ACCESS_TOKEN=paste-bearer-token-here
+KAROO_USER_ID=paste-user-id-here
+```
+
+`.env` is ignored by Git. Do not commit it and do not paste the token into
+issues, logs, or chat.
+
+Alternatively, create `~/.karooconnect/tokens.json`:
 
 ```json
 {
@@ -66,8 +84,6 @@ Create `~/.karooconnect/tokens.json`:
   "user_id": "paste-user-id-here"
 }
 ```
-
-Do not commit this file and do not paste the token into issues, logs, or chat.
 
 To get the current token and user id from your own browser session:
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -12,12 +13,17 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
 
 DEFAULT_TOKENSTORE = "~/.karooconnect/tokens.json"
+DEFAULT_ENV_FILE = ".env"
+ENV_ACCESS_TOKEN = "KAROO_ACCESS_TOKEN"
+ENV_REFRESH_TOKEN = "KAROO_REFRESH_TOKEN"
+ENV_USER_ID = "KAROO_USER_ID"
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     """Run the activity smoke test."""
     args = _parse_args(argv)
-    api = Karoo.from_token_file(args.tokenstore)
+    env = _load_env_file(args.env_file)
+    api = _build_api(args.tokenstore, env)
 
     activities_payload = api.get_activities(page=1, per_page=args.per_page)
     activities = _extract_activities(activities_payload)
@@ -53,7 +59,16 @@ def _parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
     parser.add_argument(
         "--tokenstore",
         default=DEFAULT_TOKENSTORE,
-        help=f"Path to token JSON file. Default: {DEFAULT_TOKENSTORE}",
+        help=(
+            "Path to token JSON file used when env vars are not set. "
+            f"Default: {DEFAULT_TOKENSTORE}"
+        ),
+    )
+    parser.add_argument(
+        "--env-file",
+        type=Path,
+        default=Path(DEFAULT_ENV_FILE),
+        help=f"Path to local env file. Default: {DEFAULT_ENV_FILE}",
     )
     parser.add_argument(
         "--per-page",
@@ -68,6 +83,58 @@ def _parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
         help="Optional directory where the downloaded FIT file should be written.",
     )
     return parser.parse_args(argv)
+
+
+def _build_api(tokenstore: str, env: dict[str, str]) -> Karoo:
+    access_token = _env_value(env, ENV_ACCESS_TOKEN)
+    user_id = _env_value(env, ENV_USER_ID)
+    refresh_token = _env_value(env, ENV_REFRESH_TOKEN)
+
+    if access_token and user_id:
+        return Karoo(
+            access_token=access_token,
+            refresh_token=refresh_token,
+            user_id=user_id,
+        )
+
+    return Karoo.from_token_file(tokenstore)
+
+
+def _env_value(env: dict[str, str], key: str) -> str | None:
+    value = os.environ.get(key) or env.get(key)
+    if value is None:
+        return None
+    value = value.strip()
+    return value or None
+
+
+def _load_env_file(path: Path) -> dict[str, str]:
+    if not path.exists():
+        return {}
+
+    values: dict[str, str] = {}
+    lines = path.read_text(encoding="utf-8").splitlines()
+    for line_number, raw_line in enumerate(lines, 1):
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if line.startswith("export "):
+            line = line.removeprefix("export ").strip()
+        if "=" not in line:
+            raise ValueError(f"Invalid env line {line_number}: missing '='")
+
+        key, value = line.split("=", 1)
+        key = key.strip()
+        if not key:
+            raise ValueError(f"Invalid env line {line_number}: missing key")
+        values[key] = _strip_env_quotes(value.strip())
+    return values
+
+
+def _strip_env_quotes(value: str) -> str:
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
+        return value[1:-1]
+    return value
 
 
 def _extract_activities(payload: Any) -> list[dict[str, Any]]:

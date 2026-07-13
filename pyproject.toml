@@ -58,6 +58,7 @@ module = [
     "test_auth_unit",
     "test_client_unit",
     "test_activities_unit",
+    "test_smoke_unit",
 ]
 disallow_untyped_defs = false
 warn_unused_ignores = false
@@ -120,7 +121,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"scripts/*" = ["T20"]
+"scripts/*" = ["S105", "T20"]
 "tests/*" = ["ARG", "D102", "D103", "S101", "S105", "S106", "PLR0913", "PLR2004"]
 
 [tool.coverage.run]

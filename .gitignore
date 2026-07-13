@@ -9,6 +9,10 @@ htmlcov/
 .mypy_cache/
 .ruff_cache/
 
+.env
+.env.*
+!.env.example
+
 .venv/
 __pypackages__/
 .uv-cache/
