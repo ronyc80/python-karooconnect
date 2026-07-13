@@ -18,6 +18,7 @@ class DummyResponse:
         headers: dict[str, str] | None = None,
         text: str | None = None,
         reason: str = "",
+        url: str = "",
     ) -> None:
         self.status_code = status_code
         self._payload = payload
@@ -27,6 +28,7 @@ class DummyResponse:
         self.headers = headers or {"Content-Type": "application/json"}
         self.text = text if text is not None else self.content.decode(errors="ignore")
         self.reason = reason
+        self.url = url
 
     def json(self) -> Any:
         if self._payload is not None:

@@ -76,6 +76,22 @@ KAROO_USER_ID=paste-user-id-here
 `.env` is ignored by Git. Do not commit it and do not paste the token into
 issues, logs, or chat.
 
+The current smoke-test default is `https://dashboard.hammerhead.io/v1`. If the
+dashboard request URL you see in browser developer tools uses a different base
+or prefix, set the base and prefix to match it. For example, if the request URL
+is:
+
+```text
+https://example.test/api/v1/users/{user_id}/activities
+```
+
+add:
+
+```bash
+KAROO_BASE_URL=https://example.test
+KAROO_API_PREFIX=/api/v1
+```
+
 Alternatively, create `~/.karooconnect/tokens.json`:
 
 ```json

@@ -26,7 +26,7 @@ from .exceptions import (
 if TYPE_CHECKING:
     from datetime import datetime
 
-DEFAULT_BASE_URL = "https://nexus.quarqnet.com"
+DEFAULT_BASE_URL = "https://dashboard.hammerhead.io"
 DEFAULT_API_PREFIX = "/v1"
 DEFAULT_TIMEOUT = 30.0
 USER_AGENT = "python-karooconnect/0.1.0"
@@ -502,7 +502,9 @@ def _response_error_message(response: Response) -> str:
 
     reason = getattr(response, "reason", "")
     fallback = reason or "Unexpected response"
-    return f"Karoo API error {response.status_code}: {detail or fallback}"
+    url = getattr(response, "url", "")
+    url_context = f" for {url}" if url else ""
+    return f"Karoo API error {response.status_code}{url_context}: {detail or fallback}"
 
 
 def _backoff_delay(attempt: int, *, min_wait: float, max_wait: float) -> float:

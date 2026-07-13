@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from scripts.smoke_activities import _load_env_file
+from scripts.smoke_activities import _build_api, _load_env_file
 
 
 def test_load_env_file_accepts_comments_export_and_quotes(tmp_path):
@@ -26,3 +26,19 @@ def test_load_env_file_accepts_comments_export_and_quotes(tmp_path):
         "KAROO_USER_ID": "user-123",
         "KAROO_REFRESH_TOKEN": "refresh",
     }
+
+
+def test_build_api_uses_env_base_url_and_api_prefix():
+    api = _build_api(
+        "~/.karooconnect/tokens.json",
+        {
+            "KAROO_ACCESS_TOKEN": "access",
+            "KAROO_USER_ID": "user-123",
+            "KAROO_BASE_URL": "https://example.test",
+            "KAROO_API_PREFIX": "/api/v1",
+        },
+    )
+
+    assert api.user_id == "user-123"
+    assert api.client.base_url == "https://example.test"
+    assert api.client.api_prefix == "/api/v1"

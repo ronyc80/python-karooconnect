@@ -23,7 +23,9 @@ def test_get_activities_builds_expected_query_params():
     assert result == {"items": []}
     call = session.calls[0]
     assert call["method"] == "GET"
-    assert call["url"] == "https://nexus.quarqnet.com/v1/users/user-123/activities"
+    assert call["url"] == (
+        "https://dashboard.hammerhead.io/v1/users/user-123/activities"
+    )
     assert call["kwargs"]["params"] == {
         "page": 2,
         "perPage": 25,
@@ -42,7 +44,8 @@ def test_get_activity_details_builds_details_path():
     assert result == {"id": "activity-1"}
     assert session.calls[0]["method"] == "GET"
     assert session.calls[0]["url"] == (
-        "https://nexus.quarqnet.com/v1/users/user-123/activities/" "activity-1/details"
+        "https://dashboard.hammerhead.io/v1/users/user-123/activities/"
+        "activity-1/details"
     )
 
 

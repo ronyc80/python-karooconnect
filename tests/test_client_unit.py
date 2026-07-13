@@ -28,7 +28,9 @@ def test_request_builds_prefixed_url_and_bearer_header():
     assert result == {"ok": True}
     call = session.calls[0]
     assert call["method"] == "GET"
-    assert call["url"] == "https://nexus.quarqnet.com/v1/users/user-123/activities"
+    assert call["url"] == (
+        "https://dashboard.hammerhead.io/v1/users/user-123/activities"
+    )
     assert call["kwargs"]["headers"]["Authorization"] == "Bearer access"
     assert call["kwargs"]["headers"]["Accept"] == "application/json"
 
@@ -40,7 +42,7 @@ def test_request_does_not_double_prefix_v1_path():
     client.request("GET", "/v1/users/user-123/activities")
 
     assert session.calls[0]["url"] == (
-        "https://nexus.quarqnet.com/v1/users/user-123/activities"
+        "https://dashboard.hammerhead.io/v1/users/user-123/activities"
     )
 
 
@@ -68,6 +70,7 @@ def test_request_translates_http_errors(status_code, exception_type):
             DummyResponse(
                 status_code=status_code,
                 payload={"message": "nope"},
+                url="https://dashboard.hammerhead.io/v1/nope",
             )
         ]
     )
@@ -81,6 +84,7 @@ def test_request_translates_http_errors(status_code, exception_type):
         client.request("GET", "/users/user-123/activities")
 
     assert exc_info.value.status_code == status_code
+    assert "https://dashboard.hammerhead.io/v1/nope" in str(exc_info.value)
 
 
 def test_network_errors_raise_connection_error():

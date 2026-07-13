@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from karoo import Karoo
+from karoo import Karoo, KarooClient
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -17,6 +17,8 @@ DEFAULT_ENV_FILE = ".env"
 ENV_ACCESS_TOKEN = "KAROO_ACCESS_TOKEN"
 ENV_REFRESH_TOKEN = "KAROO_REFRESH_TOKEN"
 ENV_USER_ID = "KAROO_USER_ID"
+ENV_BASE_URL = "KAROO_BASE_URL"
+ENV_API_PREFIX = "KAROO_API_PREFIX"
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -24,6 +26,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = _parse_args(argv)
     env = _load_env_file(args.env_file)
     api = _build_api(args.tokenstore, env)
+    print(
+        "Using API base "
+        f"{api.client.base_url}{api.client.api_prefix or ''} "
+        f"for user {api.user_id}"
+    )
 
     activities_payload = api.get_activities(page=1, per_page=args.per_page)
     activities = _extract_activities(activities_payload)
@@ -89,15 +96,24 @@ def _build_api(tokenstore: str, env: dict[str, str]) -> Karoo:
     access_token = _env_value(env, ENV_ACCESS_TOKEN)
     user_id = _env_value(env, ENV_USER_ID)
     refresh_token = _env_value(env, ENV_REFRESH_TOKEN)
+    base_url = _env_value(env, ENV_BASE_URL) or "https://dashboard.hammerhead.io"
+    api_prefix = _env_value(env, ENV_API_PREFIX) or "/v1"
 
     if access_token and user_id:
-        return Karoo(
+        client = KarooClient(
             access_token=access_token,
             refresh_token=refresh_token,
-            user_id=user_id,
+            base_url=base_url,
+            api_prefix=api_prefix,
         )
+        return Karoo(client=client, user_id=user_id)
 
-    return Karoo.from_token_file(tokenstore)
+    client = KarooClient(
+        tokenstore=tokenstore,
+        base_url=base_url,
+        api_prefix=api_prefix,
+    )
+    return Karoo(client=client)
 
 
 def _env_value(env: dict[str, str], key: str) -> str | None:
